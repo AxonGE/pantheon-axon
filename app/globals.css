@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 270 95% 75%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 14.9%;
+  --muted-foreground: 0 0% 63.9%;
+  --accent: 270 80% 50%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 14.9%;
+  --input: 0 0% 14.9%;
+  --ring: 270 95% 75%;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.axon-console-message {
+  @apply p-4 rounded-lg mb-3 border;
+}
+
+.axon-console-message.user {
+  @apply bg-secondary border-secondary;
+}
+
+.axon-console-message.axon {
+  @apply bg-accent/10 border-accent/30;
+}
+
+.axon-console-message.system {
+  @apply bg-muted border-muted-foreground/30 text-muted-foreground;
+}
+
+.axon-directive {
+  @apply border border-accent/30 rounded-lg p-4 mb-4;
+}
+
+.axon-log {
+  @apply border border-muted rounded-lg p-3 mb-2;
+}
+
+.axon-symbolic-fragment {
+  @apply border border-primary/30 rounded-lg p-3 mb-3;
+}
+
+.axon-tag {
+  @apply inline-block px-2 py-1 text-xs rounded-full mr-2 bg-accent/20 text-accent-foreground;
+}
