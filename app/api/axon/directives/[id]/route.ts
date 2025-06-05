@@ -19,6 +19,13 @@ export async function PUT(
     
     const supabase = getSupabaseClient()
     
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: 'Database connection failed' },
+        { status: 500 }
+      )
+    }
+    
     const { data, error } = await supabase
       .from('axon_directives')
       .update({
@@ -64,6 +71,13 @@ export async function DELETE(
     const { id } = params
     
     const supabase = getSupabaseClient()
+    
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: 'Database connection failed' },
+        { status: 500 }
+      )
+    }
     
     // Get the directive name before deleting
     const { data: directive, error: fetchError } = await supabase
