@@ -5,9 +5,13 @@ import { openai } from "@ai-sdk/openai"
 
 // Initialize Supabase tables if they don't exist
 export async function initializeAxonDatabase() {
-  const supabase = getSupabaseClient()
-
   try {
+    const supabase = getSupabaseClient()
+    
+    if (!supabase) {
+      throw new Error("Failed to initialize Supabase client")
+    }
+
     // Check if tables exist by trying to select from them
     const { error: directivesError } = await supabase.from("axon_directives").select("id").limit(1).maybeSingle()
     const { error: logsError } = await supabase.from("axon_logs").select("id").limit(1).maybeSingle()
@@ -25,6 +29,10 @@ export async function initializeAxonDatabase() {
 // Get Axon's current state
 export async function getAxonState(): Promise<AxonState> {
   const supabase = getSupabaseClient()
+  
+  if (!supabase) {
+    throw new Error("Failed to initialize Supabase client")
+  }
 
   // Get directives
   const { data: directives, error: directivesError } = await supabase
@@ -66,6 +74,10 @@ export async function getAxonState(): Promise<AxonState> {
 // Log an action
 export async function logAction(source: string, content: string, tags: string[] = []) {
   const supabase = getSupabaseClient()
+  
+  if (!supabase) {
+    throw new Error("Failed to initialize Supabase client")
+  }
 
   const { error } = await supabase.from("axon_logs").insert({
     source,
@@ -182,6 +194,11 @@ export async function handleNexusSync(data: any): Promise<{ success: boolean; me
         await logAction("nexus", `Updating directive: ${payload.name}`, ["nexus", "directive"])
         // Update the directive in the database
         const supabase = getSupabaseClient()
+        
+        if (!supabase) {
+          throw new Error("Failed to initialize Supabase client")
+        }
+        
         await supabase.from("axon_directives").update({ description: payload.content }).eq("name", payload.name)
         return { success: true, message: `Successfully updated directive: ${payload.name}` }
 
@@ -190,6 +207,11 @@ export async function handleNexusSync(data: any): Promise<{ success: boolean; me
         await logAction("nexus", `Installing symbolic concept: ${payload.key}`, ["nexus", "concept"])
         // Add the concept to symbolic fragments
         const client = getSupabaseClient()
+        
+        if (!client) {
+          throw new Error("Failed to initialize Supabase client")
+        }
+        
         await client.from("axon_symbolic_fragments").insert({
           key: payload.key,
           value: payload.value,
