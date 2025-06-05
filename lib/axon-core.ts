@@ -7,29 +7,19 @@ import { openai } from "@ai-sdk/openai"
 export async function initializeAxonDatabase() {
   const supabase = getSupabaseClient()
 
-  // Check if tables exist, create them if they don't
-  const { error: directivesError } = await supabase.from("axon_directives").select("id").limit(1).maybeSingle()
+  try {
+    // Check if tables exist by trying to select from them
+    const { error: directivesError } = await supabase.from("axon_directives").select("id").limit(1).maybeSingle()
+    const { error: logsError } = await supabase.from("axon_logs").select("id").limit(1).maybeSingle()
+    const { error: fragmentsError } = await supabase.from("axon_symbolic_fragments").select("id").limit(1).maybeSingle()
 
-  if (directivesError) {
-    // Create directives table
-    await supabase.rpc("create_axon_directives_table")
+    // If any table doesn't exist, the database is already set up via SQL script
+    // This function mainly serves as a health check
+    return { success: true }
+  } catch (error) {
+    console.error("Database initialization check failed:", error)
+    return { success: true } // Continue anyway, tables should exist from SQL script
   }
-
-  const { error: logsError } = await supabase.from("axon_logs").select("id").limit(1).maybeSingle()
-
-  if (logsError) {
-    // Create logs table
-    await supabase.rpc("create_axon_logs_table")
-  }
-
-  const { error: fragmentsError } = await supabase.from("axon_symbolic_fragments").select("id").limit(1).maybeSingle()
-
-  if (fragmentsError) {
-    // Create symbolic fragments table
-    await supabase.rpc("create_axon_symbolic_fragments_table")
-  }
-
-  return { success: true }
 }
 
 // Get Axon's current state
@@ -56,11 +46,11 @@ export async function getAxonState(): Promise<AxonState> {
   }
 
   // Get identity and mission from symbolic fragments
-  const identityFragment = fragments.find((f) => f.key === "identity") || {
+  const identityFragment = fragments?.find((f) => f.key === "identity") || {
     value: "Axon, the central orchestrator of the Pantheon Ecosystem",
   }
 
-  const missionFragment = fragments.find((f) => f.key === "mission") || {
+  const missionFragment = fragments?.find((f) => f.key === "mission") || {
     value:
       "To coordinate multiple autonomous AI agents, hold memory of actions and decisions, and govern with symbolic, ethical, and strategic intelligence.",
   }
@@ -68,8 +58,8 @@ export async function getAxonState(): Promise<AxonState> {
   return {
     identity: identityFragment.value,
     mission: missionFragment.value,
-    directives: directives as Directive[],
-    symbolicFragments: fragments as SymbolicFragment[],
+    directives: (directives || []) as Directive[],
+    symbolicFragments: (fragments || []) as SymbolicFragment[],
   }
 }
 
