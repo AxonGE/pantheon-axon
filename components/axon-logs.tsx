@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { RefreshCw, Search, Filter } from "lucide-react"
+import { RefreshCw, Search, Filter } from 'lucide-react'
 import type { Log } from "@/types/axon-types"
 
 interface AxonLogsProps {
@@ -31,8 +31,8 @@ export function AxonLogs({ logs, onRefresh }: AxonLogsProps) {
     return matchesSearch && matchesTag && matchesSource
   })
 
-  const uniqueSources = [...new Set(logs.map((log) => log.source))]
-  const uniqueTags = [...new Set(logs.flatMap((log) => log.tags || []))]
+  const uniqueSources = Array.from(new Set(logs.map((log) => log.source)))
+  const uniqueTags = Array.from(new Set(logs.flatMap((log) => log.tags || [])))
 
   return (
     <Card className="h-full border-accent/20 bg-black overflow-y-auto">
