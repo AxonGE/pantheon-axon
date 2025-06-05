@@ -6,6 +6,13 @@ export async function GET() {
   try {
     const supabase = getSupabaseClient()
     
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: 'Database connection failed' },
+        { status: 500 }
+      )
+    }
+    
     const { data, error } = await supabase
       .from('axon_symbolic_fragments')
       .select('*')
@@ -17,7 +24,7 @@ export async function GET() {
     
     return NextResponse.json({ 
       success: true, 
-      fragments: data 
+      fragments: data || [] 
     })
   } catch (error) {
     console.error('Error fetching symbolic fragments:', error)
@@ -41,12 +48,21 @@ export async function POST(request: Request) {
     
     const supabase = getSupabaseClient()
     
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: 'Database connection failed' },
+        { status: 500 }
+      )
+    }
+    
     const { data, error } = await supabase
       .from('axon_symbolic_fragments')
       .insert({
         key: fragment.key,
         value: fragment.value,
-        tags: fragment.tags || []
+        tags: fragment.tags || [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       })
       .select()
       .single()
@@ -58,7 +74,7 @@ export async function POST(request: Request) {
     // Log the action
     await logAction(
       'system', 
-      `Added symbolic fragment: ${fragment.key}`, 
+      `Created new symbolic fragment: ${fragment.key}`, 
       ['system', 'symbolic', 'create']
     )
     
