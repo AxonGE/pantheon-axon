@@ -19,6 +19,13 @@ export async function PUT(
     
     const supabase = getSupabaseClient()
     
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: 'Database connection failed' },
+        { status: 500 }
+      )
+    }
+    
     const { data, error } = await supabase
       .from('axon_symbolic_fragments')
       .update({
@@ -63,6 +70,13 @@ export async function DELETE(
     const { id } = params
     
     const supabase = getSupabaseClient()
+    
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: 'Database connection failed' },
+        { status: 500 }
+      )
+    }
     
     // Get the fragment key before deleting
     const { data: fragment, error: fetchError } = await supabase
